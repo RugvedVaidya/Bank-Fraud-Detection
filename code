@@ -1,0 +1,43 @@
+#import neccessaary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn import svm
+from sklearn.metrics import confusion matrix , accuracy_score , Classification_report
+
+#load your csv file
+cell_df= pd.read_csv('/content/trainfinal.csv')
+cell_df['y'].count()
+
+#saving fraud and clear in one data frame
+fraud_df = cell_df[cell_df['y']==1][0:50]
+clear_df = cell_df[cell_df['y']==0][0:50]
+
+axes = clear_df.plot(kind='scatter',x='balance', y='previous', color='blue', label='clear')
+fraud_df.plot(kind='scatter',x='balance', y='previous', color='red', label='fraud', ax=axes)
+
+#checking the datatype of each column
+cell_df.dtypes
+
+cell_df[pd.to_numeric(cell_df['job'], errors='coerce').notnull()]
+cell_df.dtypes
+
+#declaring feature columns
+cell_df.columns
+feature_df = cell_df[['age', 'default', 'balance', 'housing',
+       'loan', 'day', 'duration', 'campaign', 'pdays',
+       'previous']]
+
+X = np.asarray(feature_df)
+Y = np.asarray(cell_df['y'])
+Y[0:50]
+
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=4)
+print(X_test.shape)
+
+classifier= svm.SVC(kernel='linear', gamma='auto', C=2)
+classifier.fit(X_train, Y_train)
+Y_predict = classifier.predict(X_test)
+
+print(classification_report(Y_test, Y_predict))
